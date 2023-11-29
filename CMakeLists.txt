@@ -1,0 +1,49 @@
+cmake_minimum_required(VERSION 3.6.0)
+
+project(fcitx5-hallelujah VERSION 5.0.0)
+
+find_package(ECM 1.0.0 REQUIRED)
+set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${CMAKE_MODULE_PATH})
+include(FeatureSummary)
+include(GNUInstallDirs)
+include(ECMUninstallTarget)
+
+option(ENABLE_TEST "Build Test" On)
+option(BUILD_DATA "Build data" On)
+
+find_package(Gettext REQUIRED)
+find_package(Fcitx5Core 5.0.0 REQUIRED)
+find_package(Fcitx5Module REQUIRED COMPONENTS Spell TestFrontend)
+find_package(PkgConfig REQUIRED)
+find_package(fmt REQUIRED)
+
+if (NOT DEFINED MARISA_TARGET)
+    pkg_check_modules(Marisa REQUIRED IMPORTED_TARGET marisa)
+    set(MARISA_TARGET PkgConfig::Marisa)
+endif()
+
+if (NOT DEFINED JSONC_TARGET)
+    pkg_check_modules(JsonC REQUIRED IMPORTED_TARGET "json-c")
+    set(JSONC_TARGET PkgConfig::JsonC)
+endif()
+
+add_definitions(-DFCITX_GETTEXT_DOMAIN=\"fcitx5-hallelujah\")
+fcitx5_add_i18n_definition()
+
+include("${FCITX_INSTALL_CMAKECONFIG_DIR}/Fcitx5Utils/Fcitx5CompilerSettings.cmake")
+
+add_subdirectory(src)
+if (ENABLE_TEST)
+  enable_testing()
+  add_subdirectory(test)
+endif()
+if (BUILD_DATA)
+  add_subdirectory(data)
+endif()
+
+fcitx5_translate_desktop_file(org.fcitx.Fcitx5.Addon.Hallelujah.metainfo.xml.in
+                              org.fcitx.Fcitx5.Addon.Hallelujah.metainfo.xml XML)
+
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/org.fcitx.Fcitx5.Addon.Hallelujah.metainfo.xml" DESTINATION ${FCITX_INSTALL_DATADIR}/metainfo)
+
+feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)

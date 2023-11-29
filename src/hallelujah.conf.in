@@ -1,0 +1,6 @@
+[InputMethod]
+Name=Hallelujah
+Icon=fcitx-hallelujah
+Label=h
+LangCode=en
+Addon=hallelujah

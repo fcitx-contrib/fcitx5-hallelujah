@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component type="addon">
+  <id>org.fcitx.Fcitx5.Addon.Hallelujah</id>
+  <extends>org.fcitx.Fcitx5</extends>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>LGPL-2.1+</project_license>
+  <name>Hallelujah for Fcitx 5</name>
+  <summary>Hallelujah input method</summary>
+  <url type="homepage">https://fcitx-im.org</url>
+  <url type="bugtracker">https://github.com/fcitx/fcitx5-hallelujah/issues</url>
+  <project_group>Fcitx</project_group>
+  <releases>
+  </releases>
+  <content_rating type="oars-1.1"/>
+</component>

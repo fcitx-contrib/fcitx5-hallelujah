@@ -1,0 +1,8 @@
+add_library(hallelujah MODULE hallelujah.cpp)
+target_link_libraries(hallelujah Fcitx5::Core Fcitx5::Module::Spell fmt ${MARISA_TARGET} ${JSONC_TARGET})
+install(TARGETS hallelujah DESTINATION "${FCITX_INSTALL_LIBDIR}/fcitx5")
+fcitx5_translate_desktop_file(hallelujah.conf.in hallelujah.conf)
+configure_file(hallelujah-addon.conf.in.in hallelujah-addon.conf.in)
+fcitx5_translate_desktop_file("${CMAKE_CURRENT_BINARY_DIR}/hallelujah-addon.conf.in" hallelujah-addon.conf)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/hallelujah.conf" DESTINATION "${FCITX_INSTALL_PKGDATADIR}/inputmethod" COMPONENT config)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/hallelujah-addon.conf" RENAME hallelujah.conf DESTINATION "${FCITX_INSTALL_PKGDATADIR}/addon" COMPONENT config)
