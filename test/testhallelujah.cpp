@@ -13,9 +13,9 @@ using namespace fcitx;
 std::vector<std::pair<std::vector<std::string>, std::vector<std::string>>>
     expectedCommit{
         {{"a", "4"}, {"at"}},
-        {{"a", "space"}, {"a", " "}},
+        {{"a", "space"}, {"a "}},
         {{"a", "Return"}, {"a"}},
-        {{"a", "Down", "space"}, {"as", " "}},
+        {{"a", "Down", "space"}, {"as "}},
         {{"a", "Up", "Return"}, {"also"}},
         {{"a", "Escape"}, {}},
         {{"a", "b", "BackSpace", "Return"}, {"a"}},

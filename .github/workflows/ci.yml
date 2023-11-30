@@ -28,7 +28,7 @@ jobs:
 
       - name: Lint
         run: |
-          find . -name '*.cpp' -o -name '*.h' | xargs clang-format -Werror --dry-run || { echo Please lint your code by '"'"find . -name '*.cpp' -o -name '*.h' | xargs clang-format -i"'"'.; false; }
+          find src test -name '*.cpp' -o -name '*.h' | xargs clang-format -Werror --dry-run || { echo Please lint your code by '"'"find src test -name '*.cpp' -o -name '*.h' | xargs clang-format -i"'"'.; false; }
 
       - name: Build
         run: |

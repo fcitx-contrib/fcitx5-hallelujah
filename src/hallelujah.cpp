@@ -27,15 +27,15 @@ public:
     HallelujahCandidateWord(HallelujahState *state, std::string word,
                             std::string candidate)
         : state_(state), word_(word) {
-        Text text;
-        text.append(candidate);
-        setText(text);
+        setText(Text(candidate));
     }
 
     void select(InputContext *inputContext) const override {
         inputContext->commitString(word_);
         state_->reset(inputContext);
     }
+
+    std::string getWord() const { return word_; }
 
 private:
     HallelujahState *state_;
@@ -121,11 +121,15 @@ void HallelujahState::keyEvent(KeyEvent &event) {
         }
         if (key.check(FcitxKey_space) || key.check(FcitxKey_Return)) {
             event.filterAndAccept();
-            candidateList->candidate(candidateList->cursorIndex()).select(ic_);
+            std::string word =
+                dynamic_cast<const HallelujahCandidateWord &>(
+                    candidateList->candidate(candidateList->cursorIndex()))
+                    .getWord();
             if (key.check(FcitxKey_space)) {
-                ic_->commitString(" ");
+                word += " ";
             }
-            return;
+            ic_->commitString(word);
+            return reset(ic_);
         }
         if (key.check(FcitxKey_Down) || key.check(FcitxKey_Up)) {
             auto cm = candidateList->toCursorMovable();
@@ -230,8 +234,7 @@ HallelujahEngine::HallelujahEngine(Instance *instance)
 
 HallelujahEngine::~HallelujahEngine() { factory_.unregister(); }
 
-void HallelujahEngine::activate(const InputMethodEntry &entry,
-                                InputContextEvent &event) {
+void HallelujahEngine::activate(const InputMethodEntry &, InputContextEvent &) {
     spell();
 }
 
@@ -320,9 +323,7 @@ void HallelujahEngine::loadPinyin() {
     }
 }
 
-void HallelujahEngine::keyEvent(const InputMethodEntry &entry,
-                                KeyEvent &keyEvent) {
-    FCITX_UNUSED(entry);
+void HallelujahEngine::keyEvent(const InputMethodEntry &, KeyEvent &keyEvent) {
     if (keyEvent.isRelease() || keyEvent.key().states()) {
         return;
     }
