@@ -52,8 +52,6 @@ public:
     HallelujahEngine(Instance *instance);
     ~HallelujahEngine();
 
-    void activate(const InputMethodEntry &entry,
-                  InputContextEvent &event) override;
     void keyEvent(const InputMethodEntry &entry, KeyEvent &keyEvent) override;
     void reset(const InputMethodEntry &, InputContextEvent &event) override;
     FCITX_ADDON_DEPENDENCY_LOADER(spell, instance_->addonManager());
