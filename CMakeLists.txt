@@ -15,7 +15,10 @@ find_package(Gettext REQUIRED)
 find_package(Fcitx5Core 5.0.0 REQUIRED)
 find_package(Fcitx5Module REQUIRED COMPONENTS Spell TestFrontend)
 find_package(PkgConfig REQUIRED)
-find_package(fmt REQUIRED)
+
+if (NOT TARGET fmt::fmt)
+    find_package(fmt REQUIRED)
+endif()
 
 if (NOT DEFINED MARISA_TARGET)
     pkg_check_modules(Marisa REQUIRED IMPORTED_TARGET marisa)

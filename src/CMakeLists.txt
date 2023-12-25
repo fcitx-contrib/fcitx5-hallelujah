@@ -1,5 +1,5 @@
 add_library(hallelujah MODULE hallelujah.cpp)
-target_link_libraries(hallelujah Fcitx5::Core Fcitx5::Module::Spell fmt ${MARISA_TARGET} ${JSONC_TARGET})
+target_link_libraries(hallelujah Fcitx5::Core Fcitx5::Module::Spell fmt::fmt ${MARISA_TARGET} ${JSONC_TARGET})
 install(TARGETS hallelujah DESTINATION "${FCITX_INSTALL_LIBDIR}/fcitx5")
 fcitx5_translate_desktop_file(hallelujah.conf.in hallelujah.conf)
 configure_file(hallelujah-addon.conf.in.in hallelujah-addon.conf.in)
