@@ -234,10 +234,6 @@ HallelujahEngine::HallelujahEngine(Instance *instance)
 
 HallelujahEngine::~HallelujahEngine() { factory_.unregister(); }
 
-void HallelujahEngine::activate(const InputMethodEntry &, InputContextEvent &) {
-    spell();
-}
-
 void HallelujahEngine::reset(const InputMethodEntry &,
                              InputContextEvent &event) {
     auto ic = event.inputContext();
