@@ -100,7 +100,10 @@ void HallelujahState::updateUI(InputContext *ic,
             std::make_unique<HallelujahCandidateList>(this, words, candidates));
     }
     Text preedit;
-    preedit.append(buffer_.userInput());
+    auto userInput = buffer_.userInput();
+    if (!userInput.empty()) {
+        preedit.append(userInput);
+    }
     inputPanel.setPreedit(preedit);
     ic->updateUserInterface(UserInterfaceComponent::InputPanel);
 }
