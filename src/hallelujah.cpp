@@ -5,6 +5,7 @@
 #include <fcitx/candidatelist.h>
 #include <fcitx/inputpanel.h>
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 #include <json-c/json.h>
 #include <spell_public.h>
 

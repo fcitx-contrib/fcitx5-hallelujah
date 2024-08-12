@@ -1,5 +1,5 @@
-#ifndef _FCITX5_SAYURA_SAYURA_H_
-#define _FCITX5_SAYURA_SAYURA_H_
+#ifndef _FCITX5_HALLELUJAH_HALLELUJAH_H_
+#define _FCITX5_HALLELUJAH_HALLELUJAH_H_
 
 #include <fcitx-utils/i18n.h>
 #include <fcitx-utils/inputbuffer.h>

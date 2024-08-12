@@ -67,7 +67,7 @@ int main() {
     char arg1[] = "--disable=all";
     char arg2[] = "--enable=testim,testfrontend,spell,hallelujah";
     char *argv[] = {arg0, arg1, arg2};
-    fcitx::Log::setLogRule("default=5,unikey=5");
+    fcitx::Log::setLogRule("default=5,hallelujah=5");
     Instance instance(FCITX_ARRAY_SIZE(argv), argv);
     instance.addonManager().registerDefaultLoader(nullptr);
     EventDispatcher dispatcher;
