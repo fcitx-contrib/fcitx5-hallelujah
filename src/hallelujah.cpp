@@ -177,17 +177,13 @@ void HallelujahState::keyEvent(KeyEvent &event) {
                 words.begin(), words.begin() + n, words.end(),
                 [this, &normalized](const std::string &a,
                                     const std::string &b) {
-                    if (a == normalized) {
-                        return true;
-                    }
-                    if (b == normalized) {
-                        return false;
-                    }
+                    auto na = a == normalized ? 1 : 0;
+                    auto nb = b == normalized ? 1 : 0;
                     auto ia = words_->find(a);
                     auto fa = ia == words_->end() ? 0 : ia->second.frequency_;
                     auto ib = words_->find(b);
                     auto fb = ib == words_->end() ? 0 : ib->second.frequency_;
-                    return fa > fb;
+                    return std::tie(na, fa, a) > std::tie(nb, fb, b);
                 });
             words.resize(n);
         } else {
