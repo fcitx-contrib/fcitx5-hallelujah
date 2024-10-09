@@ -9,12 +9,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: ubuntu:24.10
     steps:
       - uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
-          sudo apt install -y ninja-build \
+          apt update
+          apt install -y ninja-build \
+            cmake \
+            clang \
+            pkg-config \
             clang-format \
             extra-cmake-modules \
             gettext \
@@ -36,8 +41,12 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DFCITX_INSTALL_USE_FCITX_SYS_PATHS=ON
           cmake --build build
-          sudo cmake --install build
+          cmake --install build
 
       - name: Test
         run:
           ctest --output-on-failure --test-dir build
+
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3

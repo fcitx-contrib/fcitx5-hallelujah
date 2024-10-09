@@ -33,8 +33,8 @@ public:
         : engine_(engine), ic_(ic), trie_(trie), words_(words),
           pinyin_(pinyin) {}
     void keyEvent(KeyEvent &keyEvent);
-    void updateUI(InputContext *ic, const std::vector<std::string> words,
-                  const std::vector<std::string> candidates);
+    void updateUI(InputContext *ic, const std::vector<std::string> &words,
+                  const std::vector<std::string> &candidates);
     void reset(InputContext *ic);
 
 private:
