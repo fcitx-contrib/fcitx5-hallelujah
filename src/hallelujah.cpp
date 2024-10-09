@@ -25,36 +25,36 @@ std::string lower(const std::string &s) {
 
 class HallelujahCandidateWord : public CandidateWord {
 public:
-    HallelujahCandidateWord(HallelujahState *state, std::string word,
-                            std::string candidate)
-        : state_(state), word_(word) {
-        setText(Text(candidate));
+    HallelujahCandidateWord(HallelujahState *state, const std::string &word,
+                            const std::string &comment)
+        : state_(state) {
+        setText(Text(word));
+        if (!comment.empty()) {
+            setComment(Text(comment));
+        }
     }
 
     void select(InputContext *inputContext) const override {
-        inputContext->commitString(word_);
+        inputContext->commitString(text().toString());
         state_->reset(inputContext);
     }
 
-    std::string getWord() const { return word_; }
-
 private:
     HallelujahState *state_;
-    std::string word_;
 };
 
 class HallelujahCandidateList : public CandidateList,
                                 public CursorMovableCandidateList {
 public:
     HallelujahCandidateList(HallelujahState *state,
-                            const std::vector<std::string> words,
-                            const std::vector<std::string> candidates) {
+                            const std::vector<std::string> &words,
+                            const std::vector<std::string> &comments) {
         setCursorMovable(this);
         for (size_t i = 0; i < words.size(); ++i) {
             labels_.emplace_back(std::to_string((i + 1) % 10) + " ");
             candidateWords_.emplace_back(
                 std::make_unique<HallelujahCandidateWord>(state, words[i],
-                                                          candidates[i]));
+                                                          comments[i]));
         }
     }
 
@@ -91,14 +91,14 @@ private:
 };
 
 void HallelujahState::updateUI(InputContext *ic,
-                               const std::vector<std::string> words,
-                               const std::vector<std::string> candidates) {
+                               const std::vector<std::string> &words,
+                               const std::vector<std::string> &comments) {
     auto &inputPanel = ic->inputPanel();
     if (words.empty()) {
         inputPanel.setCandidateList(nullptr);
     } else {
         inputPanel.setCandidateList(
-            std::make_unique<HallelujahCandidateList>(this, words, candidates));
+            std::make_unique<HallelujahCandidateList>(this, words, comments));
     }
     Text preedit;
     auto userInput = buffer_.userInput();
@@ -126,9 +126,9 @@ void HallelujahState::keyEvent(KeyEvent &event) {
         if (key.check(FcitxKey_space) || key.check(FcitxKey_Return)) {
             event.filterAndAccept();
             std::string word =
-                dynamic_cast<const HallelujahCandidateWord &>(
-                    candidateList->candidate(candidateList->cursorIndex()))
-                    .getWord();
+                candidateList->candidate(candidateList->cursorIndex())
+                    .text()
+                    .toString();
             if (key.check(FcitxKey_space)) {
                 word += " ";
             }
@@ -162,7 +162,7 @@ void HallelujahState::keyEvent(KeyEvent &event) {
         return reset(ic_);
     }
     std::vector<std::string> words;
-    std::vector<std::string> candidates;
+    std::vector<std::string> comments;
     if (!buffer_.empty()) {
         marisa::Agent agent;
         auto userInput = buffer_.userInput();
@@ -209,16 +209,15 @@ void HallelujahState::keyEvent(KeyEvent &event) {
                 if (!ipa.empty()) {
                     ipa = fmt::format("[{}] ", ipa);
                 }
-                candidates.emplace_back(
-                    fmt::format("{} {}{}", word, ipa,
-                                fmt::join(iter->second.translation_, " ")));
+                comments.emplace_back(fmt::format(
+                    "{}{}", ipa, fmt::join(iter->second.translation_, " ")));
             } else {
-                candidates.emplace_back(word);
+                comments.emplace_back("");
             }
         }
     }
     event.filterAndAccept();
-    updateUI(ic_, words, candidates);
+    updateUI(ic_, words, comments);
 }
 
 HallelujahEngine::HallelujahEngine(Instance *instance)
