@@ -14,13 +14,20 @@
 #include <unordered_map>
 
 namespace fcitx {
-FCITX_CONFIGURATION(HallelujahEngineConfig,
-                    Option<bool> showIPA{this, "ShowIPA", _("Show IPA"), true};
-                    Option<bool> showTranslation{this, "ShowTranslation",
-                                                 _("Show translation"), true};
-                    Option<bool> commitWithSpace{this, "CommitWithSpace",
-                                                 _("Commit with space"),
-                                                 false};);
+enum class PreeditMode { No, ComposingText };
+
+FCITX_CONFIG_ENUM_NAME_WITH_I18N(PreeditMode, N_("Do not show"),
+                                 N_("Composing text"))
+
+FCITX_CONFIGURATION(
+    HallelujahEngineConfig,
+    OptionWithAnnotation<PreeditMode, PreeditModeI18NAnnotation> preeditMode{
+        this, "PreeditMode", _("Preedit Mode"), PreeditMode::ComposingText};
+    Option<bool> showIPA{this, "ShowIPA", _("Show IPA"), true};
+    Option<bool> showTranslation{this, "ShowTranslation", _("Show translation"),
+                                 true};
+    Option<bool> commitWithSpace{this, "CommitWithSpace",
+                                 _("Commit with space"), false};);
 
 struct HallelujahWord {
     HallelujahWord(const std::vector<std::string> &translation,
@@ -48,6 +55,7 @@ public:
     HallelujahEngine *engine() { return engine_; }
 
 private:
+    void updatePreedit(InputContext *ic, const Text &preedit);
     HallelujahEngine *engine_;
     InputContext *ic_;
     InputBuffer buffer_{
@@ -67,6 +75,7 @@ public:
     const Configuration *getConfig() const override { return &config_; }
     void setConfig(const RawConfig &config) override;
     void reloadConfig() override;
+    const HallelujahEngineConfig &config() const { return config_; }
     FCITX_ADDON_DEPENDENCY_LOADER(spell, instance_->addonManager());
 
 private:

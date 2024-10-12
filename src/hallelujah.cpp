@@ -35,10 +35,9 @@ public:
     }
 
     void select(InputContext *inputContext) const override {
-        auto config = static_cast<const HallelujahEngineConfig *>(
-            state_->engine()->getConfig());
+        auto config = state_->engine()->config();
         auto word = text().toString();
-        if (*config->commitWithSpace) {
+        if (*config.commitWithSpace) {
             word += " ";
         }
         inputContext->commitString(word);
@@ -96,6 +95,22 @@ private:
     int cursor_ = 0;
 };
 
+void HallelujahState::updatePreedit(InputContext *ic, const Text &preedit) {
+    PreeditMode mode = ic->capabilityFlags().test(CapabilityFlag::Preedit)
+                           ? *engine_->config().preeditMode
+                           : PreeditMode::No;
+    auto &inputPanel = ic->inputPanel();
+    switch (mode) {
+    case PreeditMode::No:
+        inputPanel.setPreedit(preedit);
+        inputPanel.setClientPreedit(Text());
+        break;
+    case PreeditMode::ComposingText:
+        inputPanel.setClientPreedit(preedit);
+        break;
+    }
+}
+
 void HallelujahState::updateUI(InputContext *ic,
                                const std::vector<std::string> &words,
                                const std::vector<std::string> &comments) {
@@ -111,7 +126,8 @@ void HallelujahState::updateUI(InputContext *ic,
     if (!userInput.empty()) {
         preedit.append(userInput);
     }
-    inputPanel.setPreedit(preedit);
+    updatePreedit(ic, preedit);
+    ic->updatePreedit();
     ic->updateUserInterface(UserInterfaceComponent::InputPanel);
 }
 
@@ -211,13 +227,12 @@ void HallelujahState::keyEvent(KeyEvent &event) {
                 std::copy(userInput.begin(), userInput.end(), word.begin());
             }
             if (iter != words_->end()) {
-                auto config = static_cast<const HallelujahEngineConfig *>(
-                    engine_->getConfig());
-                std::string comment = *config->showIPA ? iter->second.ipa_ : "";
+                auto config = engine_->config();
+                std::string comment = *config.showIPA ? iter->second.ipa_ : "";
                 if (!comment.empty()) {
                     comment = fmt::format("[{}] ", comment);
                 }
-                if (*config->showTranslation) {
+                if (*config.showTranslation) {
                     comment += fmt::format(
                         "{}", fmt::join(iter->second.translation_, " "));
                 }
