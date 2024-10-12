@@ -1,6 +1,7 @@
 #ifndef _FCITX5_HALLELUJAH_HALLELUJAH_H_
 #define _FCITX5_HALLELUJAH_HALLELUJAH_H_
 
+#include <fcitx-config/iniparser.h>
 #include <fcitx-utils/i18n.h>
 #include <fcitx-utils/inputbuffer.h>
 #include <fcitx/addonfactory.h>
@@ -13,6 +14,14 @@
 #include <unordered_map>
 
 namespace fcitx {
+FCITX_CONFIGURATION(HallelujahEngineConfig,
+                    Option<bool> showIPA{this, "ShowIPA", _("Show IPA"), true};
+                    Option<bool> showTranslation{this, "ShowTranslation",
+                                                 _("Show translation"), true};
+                    Option<bool> commitWithSpace{this, "CommitWithSpace",
+                                                 _("Commit with space"),
+                                                 false};);
+
 struct HallelujahWord {
     HallelujahWord(const std::vector<std::string> &translation,
                    const std::string &ipa, int frequency)
@@ -36,6 +45,7 @@ public:
     void updateUI(InputContext *ic, const std::vector<std::string> &words,
                   const std::vector<std::string> &candidates);
     void reset(InputContext *ic);
+    HallelujahEngine *engine() { return engine_; }
 
 private:
     HallelujahEngine *engine_;
@@ -54,6 +64,9 @@ public:
 
     void keyEvent(const InputMethodEntry &entry, KeyEvent &keyEvent) override;
     void reset(const InputMethodEntry &, InputContextEvent &event) override;
+    const Configuration *getConfig() const override { return &config_; }
+    void setConfig(const RawConfig &config) override;
+    void reloadConfig() override;
     FCITX_ADDON_DEPENDENCY_LOADER(spell, instance_->addonManager());
 
 private:
@@ -62,10 +75,12 @@ private:
     void loadPinyin();
 
     Instance *instance_;
+    HallelujahEngineConfig config_;
     FactoryFor<HallelujahState> factory_;
     marisa::Trie trie_;
     std::unordered_map<std::string, HallelujahWord> words_;
     std::unordered_map<std::string, std::vector<std::string>> pinyin_;
+    static const inline std::string ConfPath = "conf/hallelujah.conf";
 };
 
 class HallelujahFactory : public AddonFactory {

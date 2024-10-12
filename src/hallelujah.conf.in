@@ -4,3 +4,4 @@ Icon=fcitx-hallelujah
 Label=h
 LangCode=en
 Addon=hallelujah
+Configurable=True

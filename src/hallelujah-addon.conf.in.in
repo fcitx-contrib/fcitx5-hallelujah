@@ -5,6 +5,7 @@ Version=@PROJECT_VERSION@
 Library=libhallelujah
 Type=SharedLibrary
 OnDemand=True
+Configurable=True
 
 [Addon/Dependencies]
 0=spell
