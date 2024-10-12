@@ -35,7 +35,13 @@ public:
     }
 
     void select(InputContext *inputContext) const override {
-        inputContext->commitString(text().toString());
+        auto config = static_cast<const HallelujahEngineConfig *>(
+            state_->engine()->getConfig());
+        auto word = text().toString();
+        if (*config->commitWithSpace) {
+            word += " ";
+        }
+        inputContext->commitString(word);
         state_->reset(inputContext);
     }
 
@@ -205,12 +211,17 @@ void HallelujahState::keyEvent(KeyEvent &event) {
                 std::copy(userInput.begin(), userInput.end(), word.begin());
             }
             if (iter != words_->end()) {
-                auto ipa = iter->second.ipa_;
-                if (!ipa.empty()) {
-                    ipa = fmt::format("[{}] ", ipa);
+                auto config = static_cast<const HallelujahEngineConfig *>(
+                    engine_->getConfig());
+                std::string comment = *config->showIPA ? iter->second.ipa_ : "";
+                if (!comment.empty()) {
+                    comment = fmt::format("[{}] ", comment);
                 }
-                comments.emplace_back(fmt::format(
-                    "{}{}", ipa, fmt::join(iter->second.translation_, " ")));
+                if (*config->showTranslation) {
+                    comment += fmt::format(
+                        "{}", fmt::join(iter->second.translation_, " "));
+                }
+                comments.emplace_back(std::move(comment));
             } else {
                 comments.emplace_back("");
             }
@@ -325,6 +336,14 @@ void HallelujahEngine::keyEvent(const InputMethodEntry &, KeyEvent &keyEvent) {
     auto ic = keyEvent.inputContext();
     auto *state = ic->propertyFor(&factory_);
     state->keyEvent(keyEvent);
+}
+
+void HallelujahEngine::reloadConfig() { readAsIni(config_, ConfPath); }
+
+void HallelujahEngine::setConfig(const RawConfig &config) {
+    config_.load(config, true);
+    safeSaveAsIni(config_, ConfPath);
+    reloadConfig();
 }
 } // namespace fcitx
 
