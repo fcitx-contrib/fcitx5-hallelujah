@@ -95,7 +95,14 @@ private:
     int cursor_ = 0;
 };
 
-void HallelujahState::updatePreedit(InputContext *ic, const Text &preedit) {
+void HallelujahState::updatePreedit(InputContext *ic) {
+    Text preedit;
+    auto userInput = buffer_.userInput();
+    if (!userInput.empty()) {
+        preedit.append(userInput);
+        preedit.setCursor(buffer_.cursor());
+    }
+
     PreeditMode mode = ic->capabilityFlags().test(CapabilityFlag::Preedit)
                            ? *engine_->config().preeditMode
                            : PreeditMode::No;
@@ -109,6 +116,9 @@ void HallelujahState::updatePreedit(InputContext *ic, const Text &preedit) {
         inputPanel.setClientPreedit(preedit);
         break;
     }
+
+    ic->updatePreedit();
+    ic->updateUserInterface(UserInterfaceComponent::InputPanel);
 }
 
 void HallelujahState::updateUI(InputContext *ic,
@@ -121,14 +131,7 @@ void HallelujahState::updateUI(InputContext *ic,
         inputPanel.setCandidateList(
             std::make_unique<HallelujahCandidateList>(this, words, comments));
     }
-    Text preedit;
-    auto userInput = buffer_.userInput();
-    if (!userInput.empty()) {
-        preedit.append(userInput);
-    }
-    updatePreedit(ic, preedit);
-    ic->updatePreedit();
-    ic->updateUserInterface(UserInterfaceComponent::InputPanel);
+    updatePreedit(ic);
 }
 
 void HallelujahState::reset(InputContext *ic) {
@@ -167,16 +170,32 @@ void HallelujahState::keyEvent(KeyEvent &event) {
             ic_->updateUserInterface(UserInterfaceComponent::InputPanel);
             return event.filterAndAccept();
         }
+        if (key.check(FcitxKey_Left) || key.check(FcitxKey_Right) ||
+            key.check(FcitxKey_Home) || key.check(FcitxKey_End)) {
+            auto size = buffer_.size();
+            auto cursor = buffer_.cursor();
+            if (key.check(FcitxKey_Home)) {
+                cursor = 0;
+            } else if (key.check(FcitxKey_End)) {
+                cursor = size;
+            } else {
+                cursor = (cursor + (key.check(FcitxKey_Left) ? size : 1)) %
+                         (size + 1);
+            }
+            buffer_.setCursor(cursor);
+            updatePreedit(ic_);
+            return event.filterAndAccept();
+        }
         if (key.check(FcitxKey_Escape)) {
             reset(ic_);
             return event.filterAndAccept();
         }
     }
-    if (key.check(FcitxKey_BackSpace)) {
+    if (key.check(FcitxKey_BackSpace) || key.check(FcitxKey_Delete)) {
         if (buffer_.empty()) {
             return;
         }
-        buffer_.backspace();
+        key.check(FcitxKey_BackSpace) ? buffer_.backspace() : buffer_.del();
     } else if (key.isLAZ() || key.isUAZ()) {
         buffer_.type(key.sym());
     } else {
