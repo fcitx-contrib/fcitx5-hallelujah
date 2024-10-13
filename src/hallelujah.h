@@ -55,11 +55,10 @@ public:
     HallelujahEngine *engine() { return engine_; }
 
 private:
-    void updatePreedit(InputContext *ic, const Text &preedit);
+    void updatePreedit(InputContext *ic);
     HallelujahEngine *engine_;
     InputContext *ic_;
-    InputBuffer buffer_{
-        {InputBufferOption::AsciiOnly, InputBufferOption::FixedCursor}};
+    InputBuffer buffer_{{InputBufferOption::AsciiOnly}};
     marisa::Trie *trie_;
     std::unordered_map<std::string, HallelujahWord> *words_;
     std::unordered_map<std::string, std::vector<std::string>> *pinyin_;

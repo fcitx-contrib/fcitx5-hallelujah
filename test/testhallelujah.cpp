@@ -17,8 +17,10 @@ std::vector<std::pair<std::vector<std::string>, std::vector<std::string>>>
         {{"a", "Return"}, {"a"}},
         {{"a", "Down", "space"}, {"at "}},
         {{"a", "Up", "Return"}, {"also"}},
+        {{"a", "Right", "b", "Left", "Left", "c", "Return"}, {"bac"}},
         {{"a", "Escape"}, {}},
         {{"a", "b", "BackSpace", "Return"}, {"a"}},
+        {{"a", "b", "c", "Home", "Delete", "End", "d", "Return"}, {"bcd"}},
         {{"a", "X", "e", "Return"}, {"aXe"}},
         {{"a", ","}, {"a"}}, // comma is passed to client
         {{"s", "h", "u", "r", "u", "f", "a", "3"}, {"input method"}},
