@@ -103,16 +103,17 @@ void HallelujahState::updatePreedit(InputContext *ic) {
         preedit.setCursor(buffer_.cursor());
     }
 
-    PreeditMode mode = ic->capabilityFlags().test(CapabilityFlag::Preedit)
-                           ? *engine_->config().preeditMode
-                           : PreeditMode::No;
+    hallelujah::PreeditMode mode =
+        ic->capabilityFlags().test(CapabilityFlag::Preedit)
+            ? *engine_->config().preeditMode
+            : hallelujah::PreeditMode::No;
     auto &inputPanel = ic->inputPanel();
     switch (mode) {
-    case PreeditMode::No:
+    case hallelujah::PreeditMode::No:
         inputPanel.setPreedit(preedit);
         inputPanel.setClientPreedit(Text());
         break;
-    case PreeditMode::ComposingText:
+    case hallelujah::PreeditMode::ComposingText:
         inputPanel.setClientPreedit(preedit);
         break;
     }
