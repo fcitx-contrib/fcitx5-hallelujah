@@ -14,24 +14,20 @@
 #include <unordered_map>
 
 namespace fcitx {
-namespace hallelujah {
 enum class PreeditMode { No, ComposingText };
 
 FCITX_CONFIG_ENUM_NAME_WITH_I18N(PreeditMode, N_("Do not show"),
                                  N_("Composing text"))
-} // namespace hallelujah
 
-FCITX_CONFIGURATION(HallelujahEngineConfig,
-                    OptionWithAnnotation<hallelujah::PreeditMode,
-                                         hallelujah::PreeditModeI18NAnnotation>
-                        preeditMode{this, "PreeditMode", _("Preedit Mode"),
-                                    hallelujah::PreeditMode::ComposingText};
-                    Option<bool> showIPA{this, "ShowIPA", _("Show IPA"), true};
-                    Option<bool> showTranslation{this, "ShowTranslation",
-                                                 _("Show translation"), true};
-                    Option<bool> commitWithSpace{this, "CommitWithSpace",
-                                                 _("Commit with space"),
-                                                 false};);
+FCITX_CONFIGURATION(
+    HallelujahEngineConfig,
+    OptionWithAnnotation<PreeditMode, PreeditModeI18NAnnotation> preeditMode{
+        this, "PreeditMode", _("Preedit Mode"), PreeditMode::ComposingText};
+    Option<bool> showIPA{this, "ShowIPA", _("Show IPA"), true};
+    Option<bool> showTranslation{this, "ShowTranslation", _("Show translation"),
+                                 true};
+    Option<bool> commitWithSpace{this, "CommitWithSpace",
+                                 _("Commit with space"), false};);
 
 struct HallelujahWord {
     HallelujahWord(const std::vector<std::string> &translation,
