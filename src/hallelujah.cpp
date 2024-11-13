@@ -380,5 +380,3 @@ void HallelujahEngine::setConfig(const RawConfig &config) {
     reloadConfig();
 }
 } // namespace fcitx
-
-FCITX_ADDON_FACTORY(fcitx::HallelujahFactory);

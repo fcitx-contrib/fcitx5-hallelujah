@@ -4,7 +4,6 @@
 #include <fcitx-config/iniparser.h>
 #include <fcitx-utils/i18n.h>
 #include <fcitx-utils/inputbuffer.h>
-#include <fcitx/addonfactory.h>
 #include <fcitx/addonmanager.h>
 #include <fcitx/inputcontext.h>
 #include <fcitx/inputcontextproperty.h>
@@ -89,14 +88,6 @@ private:
     std::unordered_map<std::string, HallelujahWord> words_;
     std::unordered_map<std::string, std::vector<std::string>> pinyin_;
     static const inline std::string ConfPath = "conf/hallelujah.conf";
-};
-
-class HallelujahFactory : public AddonFactory {
-public:
-    AddonInstance *create(AddonManager *manager) override {
-        registerDomain("fcitx5-hallelujah", FCITX_INSTALL_LOCALEDIR);
-        return new HallelujahEngine(manager->instance());
-    }
 };
 } // namespace fcitx
 
