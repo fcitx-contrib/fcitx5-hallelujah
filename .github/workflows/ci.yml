@@ -7,45 +7,57 @@ on:
   pull_request:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    container: ubuntu:24.10
+  lint:
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: |
-          apt update
-          apt install -y ninja-build \
-            cmake \
-            clang \
-            pkg-config \
-            clang-format \
-            extra-cmake-modules \
-            gettext \
-            fcitx5-modules-dev \
-            libfcitx5core-dev \
-            libfcitx5utils-dev \
-            libfmt-dev \
-            libjson-c-dev \
-            marisa \
-            libmarisa-dev
+        run: apt install -y clang-format
 
       - name: Lint
         run: |
           find src test -name '*.cpp' -o -name '*.h' | xargs clang-format -Werror --dry-run || { echo Please lint your code by '"'"find src test -name '*.cpp' -o -name '*.h' | xargs clang-format -i"'"'.; false; }
 
-      - name: Build
-        run: |
-          cmake -B build -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DFCITX_INSTALL_USE_FCITX_SYS_PATHS=ON
-          cmake --build build
-          cmake --install build
+  build:
+    runs-on: ubuntu-latest
+    needs: lint
+    container: archlinux:latest
+    steps:
+      - name: Install dependencies
+        run: pacman -Syu --noconfirm base-devel clang cmake ninja extra-cmake-modules fmt libuv marisa
+
+      - uses: actions/checkout@v4
+        with:
+          repository: fcitx/fcitx5
+          path: fcitx5
+
+      - name: Cache fcitx5 data files
+        uses: actions/cache@v4
+        with:
+          path: 'fcitx5/**/*.tar.*'
+          key: ${{ runner.os }}-${{ hashFiles('fcitx5/src/modules/spell/CMakeLists.txt')}}
+
+      - name: Build and Install fcitx5
+        uses: fcitx/github-actions@cmake
+        with:
+          path: fcitx5
+          cmake-option: >-
+            -DENABLE_KEYBOARD=Off -DENABLE_X11=Off -DENABLE_WAYLAND=Off -DENABLE_ENCHANT=Off
+            -DENABLE_DBUS=Off -DENABLE_SERVER=Off -DENABLE_EMOJI=Off -DUSE_SYSTEMD=Off -DENABLE_TEST=OFF
+
+      - uses: actions/checkout@v4
+        with:
+          path: fcitx5-hallelujah
+
+      - name: Build and Install fcitx5-hallelujah
+        uses: fcitx/github-actions@cmake
+        with:
+          path: fcitx5-hallelujah
 
       - name: Test
         run:
-          ctest --output-on-failure --test-dir build
+          ctest --output-on-failure --test-dir fcitx5-hallelujah/build
 
       - name: Setup tmate session
         if: ${{ failure() }}
