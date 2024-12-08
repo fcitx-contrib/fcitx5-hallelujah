@@ -3,7 +3,7 @@ Name=Hallelujah
 Category=InputMethod
 Version=@PROJECT_VERSION@
 Library=libhallelujah
-Type=SharedLibrary
+Type=@FCITX_ADDON_TYPE@
 OnDemand=True
 Configurable=True
 
