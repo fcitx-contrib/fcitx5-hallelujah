@@ -7,4 +7,4 @@ AddonInstance *HallelujahFactory::create(AddonManager *manager) {
 }
 } // namespace fcitx
 
-FCITX_ADDON_FACTORY(fcitx::HallelujahFactory);
+FCITX_ADDON_FACTORY_V2(hallelujah, fcitx::HallelujahFactory)
