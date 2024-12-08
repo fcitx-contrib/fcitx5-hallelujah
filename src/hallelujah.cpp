@@ -9,7 +9,7 @@
 #include <json-c/json.h>
 #include <spell_public.h>
 
-namespace fcitx {
+namespace fcitx::hallelujah {
 static const std::array<Key, 10> selectionKeys = {
     Key{FcitxKey_1}, Key{FcitxKey_2}, Key{FcitxKey_3}, Key{FcitxKey_4},
     Key{FcitxKey_5}, Key{FcitxKey_6}, Key{FcitxKey_7}, Key{FcitxKey_8},
@@ -379,4 +379,4 @@ void HallelujahEngine::setConfig(const RawConfig &config) {
     safeSaveAsIni(config_, ConfPath);
     reloadConfig();
 }
-} // namespace fcitx
+} // namespace fcitx::hallelujah

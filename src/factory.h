@@ -3,10 +3,10 @@
 
 #include <fcitx/addonfactory.h>
 
-namespace fcitx {
+namespace fcitx::hallelujah {
 class HallelujahFactory : public AddonFactory {
 public:
     AddonInstance *create(AddonManager *manager) override;
 };
-} // namespace fcitx
+} // namespace fcitx::hallelujah
 #endif
