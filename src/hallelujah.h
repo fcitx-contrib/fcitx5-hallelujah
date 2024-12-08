@@ -12,7 +12,7 @@
 #include <marisa/trie.h>
 #include <unordered_map>
 
-namespace fcitx {
+namespace fcitx::hallelujah {
 enum class PreeditMode { No, ComposingText };
 
 FCITX_CONFIG_ENUM_NAME_WITH_I18N(PreeditMode, N_("Do not show"),
@@ -89,6 +89,6 @@ private:
     std::unordered_map<std::string, std::vector<std::string>> pinyin_;
     static const inline std::string ConfPath = "conf/hallelujah.conf";
 };
-} // namespace fcitx
+} // namespace fcitx::hallelujah
 
 #endif
