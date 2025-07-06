@@ -63,7 +63,7 @@ void scheduleEvent(EventDispatcher *dispatcher, Instance *instance) {
 
 int main() {
     setupTestingEnvironment(
-        TESTING_BINARY_DIR, {TESTING_BINARY_DIR "/src"},
+        TESTING_BINARY_DIR, {"bin"},
         {TESTING_BINARY_DIR "/test", StandardPaths::fcitxPath("pkgdatadir")});
     char arg0[] = "testhallelujah";
     char arg1[] = "--disable=all";
