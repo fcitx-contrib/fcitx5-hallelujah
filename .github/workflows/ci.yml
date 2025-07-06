@@ -25,6 +25,7 @@ jobs:
     container: archlinux:latest
     env:
       XDG_DATA_DIRS: /opt/fcitx/share # for test
+      FCITX_DATA_DIRS: /opt/fcitx/share/fcitx5/testing/addon:/opt/fcitx/share/fcitx5/testing
     steps:
       - name: Install dependencies
         run: pacman -Syu --noconfirm base-devel clang cmake ninja extra-cmake-modules fmt libuv marisa

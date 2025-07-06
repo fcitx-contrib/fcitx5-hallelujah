@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.6.0)
 
-project(fcitx5-hallelujah VERSION 5.0.2)
+project(fcitx5-hallelujah VERSION 5.0.3)
 
 find_package(ECM 1.0.0 REQUIRED)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${CMAKE_MODULE_PATH})
@@ -12,7 +12,7 @@ option(ENABLE_TEST "Build Test" On)
 option(BUILD_DATA "Build data" On)
 
 find_package(Gettext REQUIRED)
-find_package(Fcitx5Core 5.1.12 REQUIRED)
+find_package(Fcitx5Core 5.1.13 REQUIRED)
 find_package(Fcitx5Module REQUIRED COMPONENTS Spell TestFrontend)
 find_package(PkgConfig REQUIRED)
 

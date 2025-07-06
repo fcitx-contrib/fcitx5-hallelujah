@@ -1,7 +1,7 @@
 #include "hallelujah.h"
 #include <algorithm>
 #include <cctype>
-#include <fcitx-utils/standardpath.h>
+#include <fcitx-utils/standardpaths.h>
 #include <fcitx/candidatelist.h>
 #include <fcitx/inputpanel.h>
 #include <fmt/format.h>
@@ -286,8 +286,8 @@ void HallelujahEngine::reset(const InputMethodEntry &,
 }
 
 void HallelujahEngine::loadTrie() {
-    const auto &sp = fcitx::StandardPath::global();
-    std::string trie_path = sp.locate(fcitx::StandardPath::Type::Data,
+    const auto &sp = fcitx::StandardPaths::global();
+    std::string trie_path = sp.locate(fcitx::StandardPathsType::Data,
                                       "hallelujah/google_227800_words.bin");
     if (trie_path.empty()) {
         throw std::runtime_error("Failed to load google_227800_words.bin");
@@ -296,9 +296,9 @@ void HallelujahEngine::loadTrie() {
 }
 
 void HallelujahEngine::loadWords() {
-    const auto &sp = fcitx::StandardPath::global();
+    const auto &sp = fcitx::StandardPaths::global();
     std::string words_path =
-        sp.locate(fcitx::StandardPath::Type::Data, "hallelujah/words.json");
+        sp.locate(fcitx::StandardPathsType::Data, "hallelujah/words.json");
     if (words_path.empty()) {
         throw std::runtime_error("Failed to load words.json");
     }
@@ -335,9 +335,9 @@ void HallelujahEngine::loadWords() {
 }
 
 void HallelujahEngine::loadPinyin() {
-    const auto &sp = fcitx::StandardPath::global();
+    const auto &sp = fcitx::StandardPaths::global();
     std::string pinyin_path =
-        sp.locate(fcitx::StandardPath::Type::Data, "hallelujah/cedict.json");
+        sp.locate(fcitx::StandardPathsType::Data, "hallelujah/cedict.json");
     if (pinyin_path.empty()) {
         throw std::runtime_error("Failed to load cedict.json");
     }

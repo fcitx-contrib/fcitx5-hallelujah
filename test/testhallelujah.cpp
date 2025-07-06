@@ -1,9 +1,6 @@
-#include "testdir.h"
 #include "testfrontend_public.h"
 #include <fcitx-utils/eventdispatcher.h>
 #include <fcitx-utils/log.h>
-#include <fcitx-utils/standardpath.h>
-#include <fcitx-utils/testing.h>
 #include <fcitx/addonmanager.h>
 #include <fcitx/inputmethodmanager.h>
 #include <fcitx/instance.h>
@@ -62,9 +59,6 @@ void scheduleEvent(EventDispatcher *dispatcher, Instance *instance) {
 }
 
 int main() {
-    setupTestingEnvironment(
-        TESTING_BINARY_DIR, {TESTING_BINARY_DIR "/src"},
-        {TESTING_BINARY_DIR "/test", StandardPath::fcitxPath("pkgdatadir")});
     char arg0[] = "testhallelujah";
     char arg1[] = "--disable=all";
     char arg2[] = "--enable=testim,testfrontend,spell,hallelujah";
