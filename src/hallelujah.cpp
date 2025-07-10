@@ -345,7 +345,7 @@ void HallelujahEngine::loadWords() {
 
 void HallelujahEngine::loadPinyin() {
     const auto &sp = fcitx::StandardPaths::global();
-    std::string pinyin_path =
+    auto pinyin_path =
         sp.locate(fcitx::StandardPathsType::Data, "hallelujah/cedict.json");
     if (pinyin_path.empty()) {
         throw std::runtime_error("Failed to locate cedict.json");
