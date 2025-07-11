@@ -328,7 +328,7 @@ void HallelujahEngine::loadWords() {
         const auto &frequency = value["frequency"];
 
         if (!translation.is_array() || !ipa.is_string() ||
-            !frequency.is_number_integer()) {
+            !frequency.is_number()) {
             continue;
         }
         std::vector<std::string> translations;
@@ -339,7 +339,7 @@ void HallelujahEngine::loadWords() {
         }
         words_.emplace(key, HallelujahWord(std::move(translations),
                                            ipa.get<std::string>(),
-                                           frequency.get<int>()));
+                                           frequency.get<double>()));
     }
 }
 
