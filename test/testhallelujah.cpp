@@ -9,7 +9,7 @@ using namespace fcitx;
 
 std::vector<std::pair<std::vector<std::string>, std::vector<std::string>>>
     expectedCommit{
-        {{"a", "4"}, {"are"}},
+        {{"a", "4"}, {"at"}}, // a: exact match; and are at: frequency order.
         {{"a", "space"}, {"a "}},
         {{"a", "Return"}, {"a"}},
         {{"a", "Down", "space"}, {"at "}},
