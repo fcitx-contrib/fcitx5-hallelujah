@@ -30,11 +30,11 @@ FCITX_CONFIGURATION(
 
 struct HallelujahWord {
     HallelujahWord(const std::vector<std::string> &translation,
-                   const std::string &ipa, int frequency)
+                   const std::string &ipa, double frequency)
         : translation_(translation), ipa_(ipa), frequency_(frequency) {}
     std::vector<std::string> translation_;
     std::string ipa_;
-    int frequency_;
+    double frequency_;
 };
 
 class HallelujahEngine;

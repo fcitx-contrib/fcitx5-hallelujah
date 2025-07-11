@@ -25,10 +25,7 @@ if (NOT DEFINED MARISA_TARGET)
     set(MARISA_TARGET PkgConfig::Marisa)
 endif()
 
-if (NOT DEFINED JSONC_TARGET)
-    pkg_check_modules(JsonC REQUIRED IMPORTED_TARGET "json-c")
-    set(JSONC_TARGET PkgConfig::JsonC)
-endif()
+find_package(nlohmann_json)
 
 add_definitions(-DFCITX_GETTEXT_DOMAIN=\"fcitx5-hallelujah\")
 fcitx5_add_i18n_definition()

@@ -6,8 +6,12 @@
 #include <fcitx/inputpanel.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
-#include <json-c/json.h>
+#include <fstream>
+#include <marisa/iostream.h>
+#include <nlohmann/json.hpp>
 #include <spell_public.h>
+
+using json = nlohmann::json;
 
 namespace fcitx::hallelujah {
 static const std::array<Key, 10> selectionKeys = {
@@ -287,77 +291,84 @@ void HallelujahEngine::reset(const InputMethodEntry &,
 
 void HallelujahEngine::loadTrie() {
     const auto &sp = fcitx::StandardPaths::global();
-    std::string trie_path = sp.locate(fcitx::StandardPathsType::Data,
-                                      "hallelujah/google_227800_words.bin");
+    auto trie_path = sp.locate(fcitx::StandardPathsType::Data,
+                               "hallelujah/google_227800_words.bin");
     if (trie_path.empty()) {
-        throw std::runtime_error("Failed to load google_227800_words.bin");
+        throw std::runtime_error("Failed to locate google_227800_words.bin");
     }
-    trie_.load(trie_path.c_str());
+    std::ifstream ifs(trie_path, std::ios::binary);
+    if (!ifs) {
+        throw std::runtime_error("Failed to open google_227800_words.bin");
+    }
+    ifs >> trie_;
 }
 
 void HallelujahEngine::loadWords() {
     const auto &sp = fcitx::StandardPaths::global();
-    std::string words_path =
+    auto words_path =
         sp.locate(fcitx::StandardPathsType::Data, "hallelujah/words.json");
     if (words_path.empty()) {
-        throw std::runtime_error("Failed to load words.json");
+        throw std::runtime_error("Failed to locate words.json");
     }
-    UniqueCPtr<json_object, json_object_put> obj;
-    obj.reset(json_object_from_file(words_path.c_str()));
-    if (!obj || json_object_get_type(obj.get()) != json_type_object) {
+    std::ifstream ifs(words_path);
+    if (!ifs) {
+        throw std::runtime_error("Failed to open words.json");
+    }
+    json obj;
+    ifs >> obj;
+    if (!obj.is_object()) {
         throw std::runtime_error("Invalid words.json");
     }
-    json_object_object_foreach(obj.get(), key, value) {
-        if (json_object_get_type(value) != json_type_object) {
+    for (auto &[key, value] : obj.items()) {
+        if (!value.is_object()) {
             continue;
         }
-        auto translation = json_object_object_get(value, "translation");
-        auto ipa = json_object_object_get(value, "ipa");
-        auto frequency = json_object_object_get(value, "frequency");
-        if (json_object_get_type(translation) != json_type_array ||
-            json_object_get_type(ipa) != json_type_string ||
-            json_object_get_type(frequency) != json_type_int) {
+        const auto &translation = value["translation"];
+        const auto &ipa = value["ipa"];
+        const auto &frequency = value["frequency"];
+
+        if (!translation.is_array() || !ipa.is_string() ||
+            !frequency.is_number()) {
             continue;
         }
         std::vector<std::string> translations;
-        auto n = json_object_array_length(translation);
-        for (size_t i = 0; i < n; ++i) {
-            auto item = json_object_array_get_idx(translation, i);
-            if (json_object_get_type(item) != json_type_string) {
-                continue;
+        for (const auto &item : translation) {
+            if (item.is_string()) {
+                translations.emplace_back(item.get<std::string>());
             }
-            translations.emplace_back(json_object_get_string(item));
         }
         words_.emplace(key, HallelujahWord(std::move(translations),
-                                           json_object_get_string(ipa),
-                                           json_object_get_int(frequency)));
+                                           ipa.get<std::string>(),
+                                           frequency.get<double>()));
     }
 }
 
 void HallelujahEngine::loadPinyin() {
     const auto &sp = fcitx::StandardPaths::global();
-    std::string pinyin_path =
+    auto pinyin_path =
         sp.locate(fcitx::StandardPathsType::Data, "hallelujah/cedict.json");
     if (pinyin_path.empty()) {
-        throw std::runtime_error("Failed to load cedict.json");
+        throw std::runtime_error("Failed to locate cedict.json");
     }
-    UniqueCPtr<json_object, json_object_put> obj;
-    obj.reset(json_object_from_file(pinyin_path.c_str()));
-    if (!obj || json_object_get_type(obj.get()) != json_type_object) {
+    std::ifstream ifs(pinyin_path);
+    if (!ifs) {
+        throw std::runtime_error("Failed to open cedict.json");
+    }
+    json obj;
+    ifs >> obj;
+    if (!obj.is_object()) {
         throw std::runtime_error("Invalid cedict.json");
     }
-    json_object_object_foreach(obj.get(), key, value) {
-        if (json_object_get_type(value) != json_type_array) {
+
+    for (auto &[key, value] : obj.items()) {
+        if (!value.is_array()) {
             continue;
         }
         std::vector<std::string> vec;
-        auto n = json_object_array_length(value);
-        for (size_t i = 0; i < n; ++i) {
-            auto item = json_object_array_get_idx(value, i);
-            if (json_object_get_type(item) != json_type_string) {
-                continue;
+        for (const auto &item : value) {
+            if (item.is_string()) {
+                vec.emplace_back(item.get<std::string>());
             }
-            vec.emplace_back(json_object_get_string(item));
         }
         pinyin_.emplace(key, std::move(vec));
     }
