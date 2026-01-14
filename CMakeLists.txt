@@ -33,6 +33,8 @@ fcitx5_add_i18n_definition()
 include("${FCITX_INSTALL_CMAKECONFIG_DIR}/Fcitx5Utils/Fcitx5CompilerSettings.cmake")
 
 add_subdirectory(src)
+add_subdirectory(po)
+
 if (ENABLE_TEST)
   enable_testing()
   add_subdirectory(test)
