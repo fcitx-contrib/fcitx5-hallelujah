@@ -1,0 +1,45 @@
+# Chinese translations for fcitx package.
+# Copyright (C) 2026 THE fcitx'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the fcitx package.
+# Qijia Liu <liumeo@pku.edu.cn>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fcitx 5-hallelujah\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-13 20:06-0500\n"
+"PO-Revision-Date: 2026-01-13 20:07-0500\n"
+"Last-Translator: Qijia Liu <liumeo@pku.edu.cn>\n"
+"Language-Team: Chinese (simplified) <i18n-zh@googlegroups.com>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/hallelujah.h:18
+msgid "Do not show"
+msgstr "不显示"
+
+#: src/hallelujah.h:19
+msgid "Composing text"
+msgstr "编辑中文本"
+
+#: src/hallelujah.h:24
+msgid "Preedit Mode"
+msgstr "预编辑模式"
+
+#: src/hallelujah.h:25
+msgid "Show IPA"
+msgstr "显示音标"
+
+#: src/hallelujah.h:26
+msgid "Show translation"
+msgstr "显示翻译"
+
+#: src/hallelujah.h:29
+msgid "Commit with space"
+msgstr "带空格上屏"
+
+#: src/hallelujah.conf.in:2
+msgid "Hallelujah"
+msgstr "哈利路亚"

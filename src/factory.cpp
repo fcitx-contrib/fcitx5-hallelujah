@@ -3,6 +3,7 @@
 
 namespace fcitx::hallelujah {
 AddonInstance *HallelujahFactory::create(AddonManager *manager) {
+    registerDomain("fcitx5-hallelujah", FCITX_INSTALL_LOCALEDIR);
     return new HallelujahEngine(manager->instance());
 }
 } // namespace fcitx::hallelujah
