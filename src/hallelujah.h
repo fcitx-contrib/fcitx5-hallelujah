@@ -51,9 +51,12 @@ public:
     void updateUI(InputContext *ic, const std::vector<std::string> &words,
                   const std::vector<std::string> &candidates);
     void reset(InputContext *ic);
+    void commitCandidate(InputContext *ic, const std::string &candidate);
     HallelujahEngine *engine() { return engine_; }
 
 private:
+    bool useSurroundingText() const;
+    void deleteInput(InputContext *ic);
     void updatePreedit(InputContext *ic);
     HallelujahEngine *engine_;
     InputContext *ic_;

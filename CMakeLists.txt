@@ -12,7 +12,7 @@ option(ENABLE_TEST "Build Test" On)
 option(BUILD_DATA "Build data" On)
 
 find_package(Gettext REQUIRED)
-find_package(Fcitx5Core 5.1.13 REQUIRED)
+find_package(Fcitx5Core 5.1.20 REQUIRED)
 find_package(Fcitx5Module REQUIRED COMPONENTS Spell TestFrontend)
 find_package(PkgConfig REQUIRED)
 

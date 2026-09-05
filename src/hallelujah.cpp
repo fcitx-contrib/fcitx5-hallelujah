@@ -1,6 +1,7 @@
 #include "hallelujah.h"
 #include <algorithm>
 #include <cctype>
+#include <fcitx-utils/misc.h>
 #include <fcitx-utils/standardpaths.h>
 #include <fcitx/candidatelist.h>
 #include <fcitx/inputpanel.h>
@@ -44,8 +45,7 @@ public:
         if (*config.commitWithSpace) {
             word += " ";
         }
-        inputContext->commitString(word);
-        state_->reset(inputContext);
+        state_->commitCandidate(inputContext, word);
     }
 
 private:
@@ -99,6 +99,29 @@ private:
     int cursor_ = 0;
 };
 
+bool HallelujahState::useSurroundingText() const {
+    return *engine_->config().preeditMode == PreeditMode::ComposingText &&
+           ic_->capabilityFlags().test(CapabilityFlag::SurroundingText) &&
+           (isEmscripten() || isIOS());
+}
+
+void HallelujahState::deleteInput(InputContext *ic) {
+    if (buffer_.empty()) {
+        return;
+    }
+    ic->deleteSurroundingText(-static_cast<int>(buffer_.cursor()),
+                              buffer_.size());
+}
+
+void HallelujahState::commitCandidate(InputContext *ic,
+                                      const std::string &candidate) {
+    if (useSurroundingText()) {
+        deleteInput(ic);
+    }
+    ic->commitString(candidate);
+    reset(ic);
+}
+
 void HallelujahState::updatePreedit(InputContext *ic) {
     Text preedit;
     auto userInput = buffer_.userInput();
@@ -107,14 +130,21 @@ void HallelujahState::updatePreedit(InputContext *ic) {
         preedit.setCursor(buffer_.cursor());
     }
 
+    auto &inputPanel = ic->inputPanel();
+    if (useSurroundingText()) {
+        inputPanel.setPreedit({});
+        inputPanel.setClientPreedit({});
+        ic->updatePreedit();
+        ic->updateUserInterface(UserInterfaceComponent::InputPanel);
+        return;
+    }
     PreeditMode mode = ic->capabilityFlags().test(CapabilityFlag::Preedit)
                            ? *engine_->config().preeditMode
                            : PreeditMode::No;
-    auto &inputPanel = ic->inputPanel();
     switch (mode) {
     case PreeditMode::No:
         inputPanel.setPreedit(preedit);
-        inputPanel.setClientPreedit(Text());
+        inputPanel.setClientPreedit({});
         break;
     case PreeditMode::ComposingText:
         inputPanel.setClientPreedit(preedit);
@@ -161,8 +191,7 @@ void HallelujahState::keyEvent(KeyEvent &event) {
             if (key.check(FcitxKey_space)) {
                 word += " ";
             }
-            ic_->commitString(word);
-            return reset(ic_);
+            return commitCandidate(ic_, word);
         }
         if (key.check(FcitxKey_Down) || key.check(FcitxKey_Up)) {
             auto cm = candidateList->toCursorMovable();
@@ -178,15 +207,38 @@ void HallelujahState::keyEvent(KeyEvent &event) {
             key.check(FcitxKey_Home) || key.check(FcitxKey_End)) {
             auto size = buffer_.size();
             auto cursor = buffer_.cursor();
+            auto oldCursor = cursor;
+            bool surroundingText = useSurroundingText();
+            if (surroundingText &&
+                ((key.check(FcitxKey_Left) && cursor == 0) ||
+                 (key.check(FcitxKey_Right) && cursor == size))) {
+                event.filterAndAccept();
+                ic_->forwardKey(event.rawKey(), event.isRelease(),
+                                event.time());
+                return reset(ic_);
+            }
             if (key.check(FcitxKey_Home)) {
                 cursor = 0;
             } else if (key.check(FcitxKey_End)) {
                 cursor = size;
+            } else if (surroundingText) {
+                key.check(FcitxKey_Left) ? --cursor : ++cursor;
             } else {
                 cursor = (cursor + (key.check(FcitxKey_Left) ? size : 1)) %
                          (size + 1);
             }
             buffer_.setCursor(cursor);
+            if (surroundingText) {
+                KeySym direction =
+                    cursor < oldCursor ? FcitxKey_Left : FcitxKey_Right;
+                for (size_t i = 0;
+                     i < (cursor < oldCursor ? oldCursor - cursor
+                                             : cursor - oldCursor);
+                     ++i) {
+                    ic_->forwardKey(Key(direction), event.isRelease(),
+                                    event.time());
+                }
+            }
             updatePreedit(ic_);
             return event.filterAndAccept();
         }
@@ -199,11 +251,20 @@ void HallelujahState::keyEvent(KeyEvent &event) {
         if (buffer_.empty()) {
             return;
         }
-        key.check(FcitxKey_BackSpace) ? buffer_.backspace() : buffer_.del();
+        bool backspace = key.check(FcitxKey_BackSpace);
+        bool deleted = backspace ? buffer_.backspace() : buffer_.del();
+        if (deleted && useSurroundingText()) {
+            ic_->deleteSurroundingText(backspace ? -1 : 0, 1);
+        }
     } else if (key.isLAZ() || key.isUAZ()) {
         buffer_.type(key.sym());
+        if (useSurroundingText()) {
+            ic_->commitString(Key::keySymToUTF8(key.sym()));
+        }
     } else {
-        ic_->commitString(buffer_.userInput());
+        if (!useSurroundingText()) {
+            ic_->commitString(buffer_.userInput());
+        }
         return reset(ic_);
     }
     std::vector<std::string> words;
